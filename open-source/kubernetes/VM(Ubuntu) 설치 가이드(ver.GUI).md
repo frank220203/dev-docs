@@ -1,0 +1,138 @@
+# VirtualBox 설치[ver.GUI]
+
+### Hypervisor (VirtualBox 다운로드)
+
+- 설치 링크 : https://www.virtualbox.org/
+  ![VirtualBox 설치 1](./images/k8s/virtualbox_down_1.png)
+  ![VirtualBox 설치 2](./images/k8s/virtualbox_down_2.png)
+- exe 파일 실행 후, 다음을 눌러 설치 진행
+
+### VirtualBox - Network 구성
+
+- 쿠버네티스 클러스터 구성
+```plaintext
+1. 마스터 노드
+   - name : master.example.com
+   - os : ubuntu 22.04 LTS
+   - ip : 10.100.0.104
+   - guest port : 22
+
+2. 워커 노드 1
+   - name : node1.example.com
+   - os : ubuntu 22.04 LTS
+   - ip : 10.100.0.101
+   - guest port : 22
+
+3. 워커 노드 2
+   - name : node2.example.com
+   - os : ubuntu 22.04 LTS
+   - ip : 10.100.0.102
+   - guest port : 22
+```
+
+- NAT 네트워크 추가
+  ![NAT 네트워크 추가 1](./images/k8s/NAT_네트워크추가_1.png)
+  ![NAT 네트워크 추가 2](./images/k8s/NAT_네트워크추가_2.png)
+  ![NAT 네트워크 추가 3](./images/k8s/NAT_네트워크추가_3.png)
+- 네트워크 마우스 우클릭 후 속성 편집
+  ![NAT 네트워크 추가 4](./images/k8s/NAT_네트워크추가_4.png)
+  ![NAT 네트워크 추가 5](./images/k8s/NAT_네트워크추가_5.png)
+  ![NAT 네트워크 추가 5](./images/k8s/NAT_네트워크추가_6.png)
+
+### VirtualBox - VM 생성
+
+- 가상머신(VM) 생성
+  ![가상머신 생성 1](./images/k8s/가상머신생성_1.png)
+  ![가상머신 생성 2](./images/k8s/가상머신생성_2.png)
+  ![가상머신 생성 3](./images/k8s/가상머신생성_3.png)
+  ![가상머신 생성 4](./images/k8s/가상머신생성_4.png)
+  ![가상머신 생성 5](./images/k8s/가상머신생성_5.png)
+
+### VirtualBox - VM 설정 변경
+
+- 생성된 가상머신 우클릭 후 설정 편집
+  ![가상머신 설정 변경 1](./images/k8s/가상머신설정변경_1.png)
+- 시스템 - 마더보드 - 부팅 순서에서 플로피 디스크 제거
+  ![가상머신 설정 변경 2](./images/k8s/가상머신설정변경_2.png)
+
+### VirtualBox - VM에 Ubuntu 22.04 LTS 설치
+
+- 설치 링크 : https://ubuntu.com/#download
+![Ubuntu 설치 1](./images/k8s/ubuntu_down_1.png)
+![Ubuntu 설치 2](./images/k8s/ubuntu_down_2.png)
+- VM 램 메모리 임시 증설(Ubuntu 로그인이 GUI 버전이라 최소 4G 필요)
+![VM 램 메모리 증설 1](./images/k8s/가상머신램메모리증가_1.png)
+![VM 램 메모리 증설 2](./images/k8s/가상머신램메모리증가_2.png)
+- VM에 Ubuntu 22.04 LTS 설치
+![VM에 Ubuntu 설치 1](./images/k8s/ubuntu_install_1.png)
+- VM 실행
+![VM 실행](./images/k8s/가상머신실행_1.png)
+![VM Ubuntu 설치 2](./images/k8s/ubuntu_install_2.png)
+- 계속하기를 눌러 설치 진행
+```plaintext
+1. 마스터 노드 계정 정보
+  - 이름 : master
+  - 컴퓨터 이름 : master.example.com
+  - 암호 : aktmxj  
+  
+2. 워커 노드1 계정 정보
+  - 이름 : node1
+  - 컴퓨터 이름 : node1.example.com
+  - 암호 : shem1  
+  
+3. 워커 노드2 계정 정보
+  - 이름 : node2
+  - 컴퓨터 이름 : node2.example.com
+  - 암호 : shem2
+  
+4. 모든 노드 root 정보
+  - 암호 : password
+```
+![VM Ubuntu 계정 입력](./images/k8s/우분투계정정보_1.png)
+
+### VM - Ubuntu 설정 변경
+- 네트워크 변경
+![Ubuntu 설정 변경 1](./images/k8s/우분투설정변경_1.png)
+![Ubuntu 설정 변경 2](./images/k8s/우분투설정변경_2.png)
+![Ubuntu 설정 변경 3](./images/k8s/우분투설정변경_3.png)
+- 터미널에서 호스트 설정 변경
+  ```bash
+  # 쿠버네티스는 hostname이 노드의 이름이 된다. 클러스터를 구성하고 나고서 이름을 바꿀 경우,
+  # kubelet에서 kubernetes node is NOTReady | Unable to register node "node-server", it is forbidden 에러가 발생하니 주의
+  $ sudo vi /etc/hostname
+  # master.example.com 추가
+  ```
+  ![호스트 설정 변경 1](./images/k8s/호스트설정변경_1.png)
+  ```bash
+  $ sudo vi /etc/hosts
+  # 10.100.0.104  master.example.com  master 추가
+  # 10.100.0.101  node1.example.com node1 추가
+  # 10.100.0.102  node2.example.com node2 추가
+  ```
+  ![호스트 설정 변경 2](./images/k8s/호스트설정변경_2.png)
+- root 계정 암호 설정
+```bash
+  $ sudo passwd root
+  ```
+- 텍스트 로그인으로 변경
+```bash
+  $ su - # root 계정 로그인
+  $ systemctl set-default multi-user.target # GUI 로그인으로 재변경하는 방법 : systemctl isolate graphical.target 
+  ```
+
+- SSH 서버 및 그 외 패키지 설치
+ ```bash
+  $ apt-get update - # 설치가능한 리눅스 패키지 리스트 업데이트
+  $ apt-get install -y openssh-server curl vim tree 
+  ```
+### VM 이미지 스냅샷 생성
+
+![VM 이미지 적용 1](./images/k8s/vm_이미지적용_1.png)
+![VM 이미지 적용 2](./images/k8s/vm_이미지적용_2.png)
+![VM 이미지 적용 3](./images/k8s/vm_이미지적용_3.png)
+
+### VM 이미지 스냅샷 적용
+
+![VM 이미지 적용 4](./images/k8s/vm_이미지적용_4.png)
+- 이름만 변경 후 다음을 눌러 복제 진행
+  ![VM 이미지 적용 5](./images/k8s/vm_이미지적용_5.png)
