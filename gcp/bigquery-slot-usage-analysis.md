@@ -20,9 +20,9 @@
 
 **지연 해소 방법 :** 
 - 10월 2일 - slot 12000으로 증설 -> 지연 미해소
-- 10월 3일 - slot 12000으로 유지 -> 지연 해소
-- 10월 8일 - slot 12000으로 증설 -> 지연 해소
-- 11월 2일 - 자연 해소
+- 10월 3일 - slot 12000으로 유지 -> 지연 해소 (slot 7000으로 원복)
+- 10월 8일 - slot 12000으로 증설 -> 지연 해소 (slot 7000으로 원복)
+- 11월 2일 - 지연 해소 (slot 7000 유지)
 
 ## 분석 방법
 **1. 2024년 9월 30일 ~ 2024년 11월 6일까지 job 비교 분석**
@@ -51,9 +51,9 @@ ORDER BY cyymmdd, user_email
 - 2024년 9월 30일 (Weekly 작업이 시작)
 - 2024년 10월 1일 (Monthly 작업이 시작)
 - 2024년 10월 2일 (slot 12000 증설 - 지연 미해소)
-- 2024년 10월 3일 (slot 12000 증설 - 지연 해소)
+- 2024년 10월 3일 (slot 12000 증설 - 지연 해소 -> slot 7000으로 원복)
 - 2024년 10월 7일 (Weekly 작업이 시작)
-- 2024년 10월 8일 (slot 12000 증설 - 지연 해소)
+- 2024년 10월 8일 (slot 12000 증설 - 지연 해소 -> slot 7000으로 원복)
 - 2024년 11월 1일 (Monthly 작업이 시작)
 - 2024년 11월 2일 (slot 7000 유지 - 지연 해소)
 - 2024년 11월 3일 (slot 7000 유지 - 지연 해소)
@@ -69,17 +69,14 @@ ORDER BY cyymmdd, user_email
 | 20240930 | bigdata-composer-daily | 67,356,000,574 | 24156 |
 | 20240930 | bigdata-composer-weekly-monthly | 112,267,856,797 | 8667 |
 ||| 981,368,797,007 | 203161 |
-|
 | 20241001 | bigdata-composer-raw | 475,367,711,149 | <span style="color: #FFDB58;">83496</span> |
 | 20241001 | bigdata-composer-daily | 105,218,934,496 | 22779 |
 | 20241001 | bigdata-composer-weekly-monthly | 206,088,661,735 | 4346 |
 ||| 786,675,307,380 | <span style="color: #FFDB58;">110621</span> |
-|
 | 20241101 | bigdata-composer-raw | 786,091,595,665 | 193327 |
 | 20241101 | bigdata-composer-daily | 37,062,270,462 | 15516 |
 | 20241101 | bigdata-composer-weekly-monthly | 155,284,772,649 | 6601 |
 ||| 978,438,638,776 | 215444 |
-|
 
 **1-2. <span style="color: #FFDB58;">10월 1일</span> vs 11월 1일 - 총 작업시간(Duration Time)은 비슷**
 ```sql
@@ -107,12 +104,10 @@ ORDER BY cyymmdd, user_email
 | 20241001 | bigdata-composer-daily | 790686 |
 | 20241001 | bigdata-composer-weekly-monthly | 1035075 |
 ||| <span style="color: #FFDB58;">3998656</span> |
-|
 | 20241101 | bigdata-composer-raw | 3592954 |
 | 20241101 | bigdata-composer-daily | 734030 |
 | 20241101 | bigdata-composer-weekly-monthly | 93131 |
 ||| <span style="color: #FFDB58;">4420115</span> |
-|
 
 **1-3. <span style="color: #FFDB58;">10월 1일</span> vs 11월 1일 - 평균 작업시간은 더 긺 (raw 작업 제외)**
 ```sql
@@ -139,11 +134,9 @@ ORDER BY cyymmdd, user_email
 | 20241001 | bigdata-composer-raw | 26.02394 |
 | 20241001 | bigdata-composer-daily | <span style="color: #FFDB58;">34.71118</span> |
 | 20241001 | bigdata-composer-weekly-monthly | <span style="color: #FFDB58;">238.1673</span> |
-|
 | 20241101 | bigdata-composer-raw | 18.58485 |
 | 20241101 | bigdata-composer-daily | <span style="color: #FFDB58;">6.002256</span> |
 | 20241101 | bigdata-composer-weekly-monthly | <span style="color: #FFDB58;">111.1998</span> |
-|
 
 **1-4. <span style="color: #FFDB58;">10월 1일</span> vs 11월 1일 - 평균 작업시간 238(s) 보다 오래 걸린 job이 더 많음 (raw 작업 제외)**
 ```sql
@@ -172,11 +165,9 @@ ORDER BY cyymmdd, user_email
 | 20241001 | bigdata-composer-raw | 1223 |
 | 20241001 | bigdata-composer-daily | <span style="color: #FFDB58;">456</span> |
 | 20241001 | bigdata-composer-weekly-monthly | <span style="color: #FFDB58;">403</span> |
-|
 | 20241101 | bigdata-composer-raw | 2166 |
 | 20241101 | bigdata-composer-daily | <span style="color: #FFDB58;">46</span> |
 | 20241101 | bigdata-composer-weekly-monthly | <span style="color: #FFDB58;">282</span> |
-|
 
 ### 2. 지연 해소 위해 slot 12000으로 증설 (<span style="color: red;">raw, daily 작업은 24시간 내에 완료 필요</span>)
 **slot 증설로 사용한 slot 수, 처리한 job 수 증가**
@@ -186,22 +177,18 @@ ORDER BY cyymmdd, user_email
 | 20241002 | bigdata-composer-daily | 148,453,606,906 | 39343 |
 | 20241002 | bigdata-composer-weekly-monthly | 12,083 | 1 |
 ||| <span style="color: red;">1,749,646,615,689</span> | <span style="color: red;">330779</span> |
-|
 | 20241003 | bigdata-composer-raw | 1,380,787,356,441 | 257731 |
 | 20241003 | bigdata-composer-daily | 201,341,432,404 | 58321 |
 | 20241003 | bigdata-composer-weekly-monthly | 16,161 | 1 |
 ||| <span style="color: red;">1,582,128,805,006</span> | <span style="color: red;">316053</span> |
-|
 | 20241008 | bigdata-composer-raw | 1,391,451,019,781 | 232903 |
 | 20241008 | bigdata-composer-daily | 248,578,162,872 | 57925 |
 | 20241008 | bigdata-composer-weekly-monthly | 10,864 | 2 |
 ||| <span style="color: red;">1,640,029,193,517</span> | <span style="color: red;">290830</span> |
-|
 | 20241102 | bigdata-composer-raw | 843,561,910,915 |219694 |
 | 20241102 | bigdata-composer-daily | 163,329,667,464 |57234 |
 | 20241102 | bigdata-composer-weekly-monthly | 11,035 | 1 |
 ||| 1,006,891,589,414 | 276929 |
-|
 
 ### 3. 비슷한 job 수에도 slot 7000 유지 (<span style="color: skyblue;">Weekly, Monthly 작업 수행 방식 변경</span>)
 **3-1. <span style="color: red;">기존 : </span> Weekly, Monthly 작업은 <span style="color: red;">개별</span> 서비스마다 GCP Bucket의 raw, daily 작업의 '.end' 파일 체크 후, job 수행 -> <span style="color: red;">동시 작업 증가로 slot 경쟁 발생</span>**
@@ -272,7 +259,6 @@ ORDER BY cyymmddH
 | 20241001-01 | airflow_day_v02_app2_2024_08_31T15_40_00_00_00_hashcode |
 | <span style="color: red;">20241001-01</span> | airflow_<span style="color: red;">weekly</span>_v01_app4_2024_08_31T22_00_00_00_00_hashcode |
 | 20241001-01 | airflow_weekly_v01_app9_2024_08_31T22_00_00_00_00_hashcode |
-|
 
 **3-3. <span style="color: skyblue;">변경 후 : </span> Daily 작업 모니터링 DAG으로 GCP Bucket에 <span style="color: skyblue;">모든</span> 서비스의 daily 작업 '.end' 파일 체크 후, <span style="color: skyblue;">'daily.end'</span> 파일 생성**
 ```python
@@ -365,7 +351,6 @@ check_end_file = GoogleCloudStorageMultiObjectSensor(
 | <span style="color: skyblue;">20241001-01</span> | airflow_<span style="color: skyblue;">month</span>_v01_app4_2024_08_31T22_00_00_00_00_hashcode |
 | 20241001-01 | airflow_month_v01_app1_2024_08_31T22_00_00_00_00_hashcode |
 | 20241001-01 | airflow_month_v01_app3_2024_08_31T22_00_00_00_00_hashcode |
-|
 
 ## 결론
 ### 1. Weekly, Monthly 작업의 Task 수행 방식 변경으로 slot의 경쟁이 감소
