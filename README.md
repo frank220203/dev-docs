@@ -15,3 +15,6 @@
 - [SSH](./open-source/kubernetes/2.SSH가이드.md)
 - [도커](./open-source/kubernetes/3.도커설치가이드.md)
 - [쿠버네티스](./open-source/kubernetes/4.k8s설치가이드.md)
+
+### [GCP]
+- [BigQuery Slot 사용량 분석](./gcp/bigquery-slot-usage-analysis.md)
