@@ -168,5 +168,18 @@ kafka-topics.sh --create --bootstrap-server kafka-broker-1:19092 --replication-f
 
 ### 토픽 확인
 ```bash
+# 도커 컨테이너 내에서 브로커에 접근하는 경우 kafka-broker-1:19092를 사용하고, 도커 외부에서 브로커에 접근하는 경우 localhost:29092를 쓴다.
 kafka-topics.sh --list --bootstrap-server kafka-broker-1:19092
+```
+
+### 메시지 발행
+```bash
+kafka-console-producer.sh --bootstrap-server kafka-broker-1:19092 --topic topic-name
+>> Hello, Kafka~
+>> (탈출) Ctrl + c
+```
+
+### 메시지 확인
+```bash
+kafka-console-consumer.sh --bootstrap-server kafka-broker-1:19092 --topic topic-name --from-beginning
 ```
